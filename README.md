@@ -1,52 +1,78 @@
 # KShare
 
-Share an Omarchy screen on the local network and watch it in a native Windows window.
+Share an Omarchy screen on the local network and watch it in the native Windows app. Both computers must be on the same network. There is no browser viewer.
 
-The Omarchy side is a shell plugin (`kshare.screen`) plus a Python host. The Windows side is a WinForms app. There is no browser viewer.
+## 1. Prepare the Omarchy computer
 
-## Omarchy
-
-Install from the AUR once the package is published:
+Install the capture tools if they are not already there:
 
 ```bash
-yay -S kshare
+sudo pacman -S --needed python ffmpeg gpu-screen-recorder
+```
+
+Add this repository as a shell plugin and turn it on:
+
+```bash
+omarchy plugin add https://github.com/andray-nkhatel/kshare.git
+omarchy plugin enable kshare.screen
+```
+
+If **Share** does not show up on the bar, reload plugins and enable it again:
+
+```bash
+omarchy-shell shell rescanPlugins
+omarchy plugin enable kshare.screen
+```
+
+The button lands on the right side of the bar. You can move it later with `omarchy bar move`.
+
+## 2. Start sharing
+
+1. Click **Share** on the bar.
+2. Click **Start sharing**.
+3. Leave the popup open long enough to read the 6-digit PIN. Sharing keeps running after you close the popup.
+4. Click **Stop sharing** when you are done.
+
+If the popup says the service is not enabled, run `omarchy plugin enable kshare.screen` again. The host needs the KShare service running, not only the bar button.
+
+You can also start the host from a terminal. It prints the same PIN:
+
+```bash
+python -m kshare host
+```
+
+Stop that process with Ctrl+C.
+
+## 3. Build the Windows app
+
+On the Windows PC, install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0), then:
+
+```bash
+git clone https://github.com/andray-nkhatel/kshare.git
+cd kshare\windows\KShareView
+dotnet build -c Release
+```
+
+The program is `windows\KShareView\bin\Release\net8.0-windows\KShare.exe`.
+
+## 4. Watch the screen
+
+1. Start sharing on Omarchy first, so the Windows app can find the host.
+2. Run `KShare.exe`.
+3. Wait until a host appears, or type `http://<omarchy-ip>:47330/` yourself.
+4. Enter the PIN from the Omarchy popup.
+5. Press **Watch**. Press **Stop** to disconnect.
+
+Find the Omarchy address on that machine with `ip -4 addr`. The host announces itself on UDP port 47331 and serves the picture on TCP port 47330. If the Windows app stays empty, allow those ports through the firewall on both computers.
+
+## 5. Optional: install from the AUR later
+
+`PKGBUILD` is ready for an AUR upload. After `yay -S kshare`:
+
+```bash
 kshare-enable
 omarchy-shell shell rescanPlugins
 omarchy plugin enable kshare.screen
 ```
 
-Or clone this repo and add it as a plugin (the manifest is at the repository root):
-
-```bash
-omarchy plugin add <git-url-of-this-repo>
-omarchy plugin enable kshare.screen
-```
-
-The host then runs from this checkout if `/usr/bin/kshare` is not installed. It needs `python`, `ffmpeg`, and `gpu-screen-recorder`.
-
-Click **Share** on the bar, then **Start sharing**. The popup shows a 6-digit PIN.
-
-`python -m kshare host` still starts the host from a terminal. `python -m kshare find` lists hosts announced on the LAN.
-
-## Windows
-
-On a Windows PC on the same network:
-
-```bash
-cd windows/KShareView
-dotnet build -c Release
-```
-
-Run `KShare.exe`. It listens for the Omarchy host, or you can type `http://<omarchy-ip>:47330/`. Enter the PIN and press Watch.
-
-Requires the .NET 8 desktop runtime.
-
-## AUR
-
-`PKGBUILD` installs:
-
-- `/usr/bin/kshare` and `/usr/bin/kshare-enable`
-- the Python package under `/usr/lib/kshare`
-- the plugin files under `/usr/share/kshare/plugin`
-
-Publish by pushing a `v0.2.0` tag and pointing the AUR `source` at that tarball, then run `makepkg --printsrcinfo > .SRCINFO`.
+That links `/usr/share/kshare/plugin` into your Omarchy plugin folder and uses `/usr/bin/kshare` as the host.
