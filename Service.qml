@@ -65,14 +65,14 @@ Item {
         pin = String(data.pin || "")
         url = String(data.url || "")
         hostName = String(data.name || "")
-        sharing = pin.length === 6
+        sharing = data.sharing === true || pin.length === 6
     }
 
     Process {
         id: hostProc
         command: [
             "bash", "-c",
-            "if command -v kshare >/dev/null 2>&1; then exec kshare host --fps \"$1\" --status-file \"$2\"; fi; export PYTHONPATH=\"$0${PYTHONPATH:+:$PYTHONPATH}\"; exec python3 -m kshare host --fps \"$1\" --status-file \"$2\"",
+            "if command -v kshare >/dev/null 2>&1; then exec kshare cast --fps \"$1\" --status-file \"$2\"; fi; export PYTHONPATH=\"$0${PYTHONPATH:+:$PYTHONPATH}\"; exec python3 -m kshare cast --fps \"$1\" --status-file \"$2\"",
             root.pluginDir, String(root.fps), root.statusPath
         ]
         stdout: StdioCollector {

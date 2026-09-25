@@ -64,6 +64,8 @@ Panel {
                         return "The KShare service is not running. Enable kshare.screen, then open this again."
                     if (root.service.errorText)
                         return root.service.errorText
+                    if (root.service.sharing && root.service.pin === "")
+                        return "Mirroring this screen to " + (root.service.hostName || "the board") + "."
                     if (root.service.sharing)
                         return "On the Windows PC, open KShare and enter this PIN."
                     return "Share this screen with a Windows PC on the same network."

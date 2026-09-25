@@ -1,7 +1,9 @@
 import argparse
+import json
 import sys
 
 from kshare import __version__
+from kshare.board import find_board, mirror_board
 from kshare.host import serve
 from kshare.discover import listen
 
@@ -27,11 +29,33 @@ def main(argv: list[str] | None = None) -> int:
     )
     host.add_argument("--status-file", help="write url and PIN as JSON for the Omarchy plugin")
 
+    cast = sub.add_parser("cast", help="mirror to a Horion board, or host for Windows if none is found")
+    cast.add_argument("--fps", type=int, default=15)
+    cast.add_argument("--monitor", help="monitor name (Linux gpu-screen-recorder)")
+    cast.add_argument("--status-file", help="write status JSON for the Omarchy plugin")
+    cast.add_argument("--port", type=int, default=47330)
+    cast.add_argument("--pin", help="6-digit PIN used when falling back to the Windows host")
+    cast.add_argument("--name", help="name shown to Windows viewers")
+    cast.add_argument("--no-discover", action="store_true")
+
     find = sub.add_parser("find", help="list hosts announced on the LAN")
     find.add_argument("--seconds", type=float, default=3.0)
 
     args = parser.parse_args(argv)
     if args.cmd == "host":
+        serve(args)
+        return 0
+    if args.cmd == "cast":
+        board = find_board()
+        if board:
+            ip, name = board
+            try:
+                mirror_board(ip, name, args.fps, args.monitor, args.status_file)
+            except (OSError, ConnectionError, json.JSONDecodeError) as exc:
+                print(f"Board mirror failed: {exc}", flush=True)
+                return 1
+            return 0
+        print("No Horion board found. Starting the Windows host instead.", flush=True)
         serve(args)
         return 0
     if args.cmd == "find":
