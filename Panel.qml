@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
 import qs.Commons
@@ -33,37 +32,36 @@ Panel {
         bar: root.bar
         open: root.opened
         centerOnBar: true
-        contentWidth: popup.fittedContentWidth(280)
+        contentWidth: popup.fittedContentWidth(Style.space(420))
         contentHeight: popup.fittedContentHeight(column.implicitHeight)
 
-        ColumnLayout {
+        Column {
             id: column
-            width: popup.contentWidth
-            spacing: Style.space(10)
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            spacing: Style.space(12)
 
             Text {
-                Layout.fillWidth: true
-                Layout.leftMargin: Style.space(14)
-                Layout.rightMargin: Style.space(14)
-                Layout.topMargin: Style.space(14)
+                width: parent.width
                 text: "KShare"
                 color: root.ink
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.title
                 font.weight: Font.DemiBold
+                elide: Text.ElideNone
             }
 
             Text {
-                Layout.fillWidth: true
-                Layout.leftMargin: Style.space(14)
-                Layout.rightMargin: Style.space(14)
+                id: message
+                width: parent.width
                 wrapMode: Text.WordWrap
                 color: root.ink
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.body
                 text: {
                     if (!root.service)
-                        return "Enable the KShare service, then open this again."
+                        return "The KShare service is not running. Enable kshare.screen, then open this again."
                     if (root.service.errorText)
                         return root.service.errorText
                     if (root.service.sharing)
@@ -74,8 +72,7 @@ Panel {
 
             Text {
                 visible: root.service && root.service.sharing
-                Layout.fillWidth: true
-                Layout.leftMargin: Style.space(14)
+                width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 text: root.service ? root.service.pin : ""
                 color: root.ink
@@ -86,10 +83,8 @@ Panel {
 
             Text {
                 visible: root.service && root.service.url !== ""
-                Layout.fillWidth: true
-                Layout.leftMargin: Style.space(14)
-                Layout.rightMargin: Style.space(14)
-                wrapMode: Text.WordWrap
+                width: parent.width
+                wrapMode: Text.WrapAnywhere
                 text: root.service ? root.service.url : ""
                 color: root.ink
                 font.family: root.fontFamily
@@ -97,8 +92,7 @@ Panel {
             }
 
             Button {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin: Style.space(14)
+                anchors.horizontalCenter: parent.horizontalCenter
                 text: root.service && root.service.sharing ? "Stop sharing" : "Start sharing"
                 enabled: root.service !== null
                 onClicked: {
