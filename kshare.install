@@ -1,0 +1,12 @@
+post_install() {
+  echo "Enable the bar plugin for your user:"
+  echo "  kshare-enable"
+  echo "  omarchy-shell shell rescanPlugins"
+  echo "  omarchy plugin enable kshare.screen"
+  echo "The Windows viewer is windows/KShareView. Build it on Windows with:"
+  echo "  dotnet build -c Release"
+}
+
+post_upgrade() {
+  post_install
+}

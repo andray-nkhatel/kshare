@@ -1,0 +1,3 @@
+#!/bin/sh
+export PYTHONPATH="/usr/lib/kshare${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m kshare "$@"

@@ -1,0 +1,6 @@
+KShareWin.zip
+__pycache__/
+*.pyc
+bin/Release/
+bin/Debug/
+obj/

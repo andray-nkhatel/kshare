@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "kshare.screen",
+  "name": "KShare",
+  "version": "0.2.0",
+  "author": "KShare",
+  "license": "MIT",
+  "description": "Share this Omarchy screen on the LAN. Watch it with the native Windows viewer.",
+  "kinds": ["service", "bar-widget"],
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "service": {
+    "displayName": "KShare",
+    "description": "Keeps the screen-share host running.",
+    "defaults": {},
+    "schema": []
+  },
+  "barWidget": {
+    "displayName": "KShare",
+    "description": "Start and stop screen sharing. The PIN is shown in the popup.",
+    "category": "Utilities",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "fps": 15
+    },
+    "schema": [
+      {
+        "key": "fps",
+        "type": "integer",
+        "label": "Frames per second",
+        "defaultValue": 15,
+        "min": 5,
+        "max": 30,
+        "description": "Capture rate while a Windows viewer is connected."
+      }
+    ]
+  }
+}
